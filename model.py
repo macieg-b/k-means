@@ -82,6 +82,15 @@ class Calculation:
         return result
 
     @staticmethod
+    def proper_classes(cx_vector, y_vector):
+        c_x_new = {}
+        for i in range(len(cx_vector)):
+            classes = [y_vector[i] for i in cx_vector[i]]
+            best_class = max(set(classes), key=classes.count)
+            c_x_new[best_class] = cx_vector[i]
+        return c_x_new
+
+    @staticmethod
     def quantization_error(x_vector, c_vector, cx_vector, d_function='EUC', p=2):
         error_sum = 0
 
@@ -94,6 +103,17 @@ class Calculation:
             for j in cx_vector[i]:
                 error_sum += d[i][j]
         return error_sum
+
+    @staticmethod
+    def accuracy(cx_vector, y_vector):
+        errors = 0
+        keys = list(cx_vector.keys())
+        for key in keys:
+            for i in cx_vector[key]:
+                if y_vector[i] != key:
+                    errors += 1
+
+        return (len(y_vector) - errors) / len(y_vector)
 
 
 class DataManager:
@@ -127,7 +147,7 @@ class PlotGenerator:
     RED = "#c8515f"
 
     @staticmethod
-    def plot_clusters_2d(cx_vector, x_vector):
+    def clusters_2d(cx_vector, x_vector):
         rand_color = randomcolor.RandomColor()
         for cluster in range(len(cx_vector)):
             color = rand_color.generate()[0]
@@ -140,7 +160,7 @@ class PlotGenerator:
         plt.show()
 
     @staticmethod
-    def plot_clusters_3d(cx_vector, x_vector):
+    def clusters_3d(cx_vector, x_vector):
         fig = plt.figure()
         ax = Axes3D(fig)
         rand_color = randomcolor.RandomColor()
@@ -158,7 +178,7 @@ class PlotGenerator:
         plt.show()
 
     @staticmethod
-    def plot_data_set_2d(x, y):
+    def data_set_2d(x, y):
         classes = list(set(y))
         rand_color = randomcolor.RandomColor()
         colors = rand_color.generate(count=len(classes))
@@ -172,7 +192,7 @@ class PlotGenerator:
         plt.show()
 
     @staticmethod
-    def plot_data_set_3d(x, y):
+    def data_set_3d(x, y):
         fig = plt.figure()
         ax = Axes3D(fig)
         classes = list(set(y))
