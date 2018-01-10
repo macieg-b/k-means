@@ -3,6 +3,7 @@ import random
 
 import numpy as np
 import randomcolor
+import time
 from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from numpy.linalg import inv
@@ -115,6 +116,21 @@ class Calculation:
 
         return (len(y_vector) - errors) / len(y_vector)
 
+    @staticmethod
+    def timer(x):
+        time_measurements = []
+
+        for i in range(1, 20):
+            x_temp = DataManager.split_data(x, i / 20)
+
+            k_means = KMeans(x, [], 3)
+            k_means.random_centers()
+            start = time.time()
+            C, CX = k_means.process(x_temp)
+            end = time.time()
+            time_measurements.append(end - start)
+        return time_measurements
+
 
 class DataManager:
     def __init__(self):
@@ -135,47 +151,16 @@ class DataManager:
         return x_data, y_data
 
     @staticmethod
-    def split_data(x, y, ratio):
-        random.shuffle(x)
-        teach_size = int(len(x) * ratio)
-        return x[:teach_size], x[teach_size:], y[:teach_size], y[teach_size:]
+    def split_data(x, ratio):
+        idx = np.random.permutation(len(x))
+        xu = [x[i] for i in idx[0:int(np.floor(len(x) * ratio) + 1)]]
+        return xu
 
 
 class PlotGenerator:
     BLUE = "#7161ef"
     GREEN = "#00fa9a"
     RED = "#c8515f"
-
-    @staticmethod
-    def clusters_2d(cx_vector, x_vector):
-        rand_color = randomcolor.RandomColor()
-        for cluster in range(len(cx_vector)):
-            color = rand_color.generate()[0]
-            for i in cx_vector[cluster]:
-                plt.scatter(x_vector[i][0], x_vector[i][1], s=4, c=color)
-
-        plt.title("Rzut na 2 zmienne losowe - algorytm k-środków")
-        plt.xlabel('x1')
-        plt.ylabel('x2')
-        plt.show()
-
-    @staticmethod
-    def clusters_3d(cx_vector, x_vector):
-        fig = plt.figure()
-        ax = Axes3D(fig)
-        rand_color = randomcolor.RandomColor()
-        for cluster in range(len(cx_vector)):
-            color = rand_color.generate()[0]
-            for i in cx_vector[cluster]:
-                ax.scatter(x_vector[i][0], x_vector[i][1], x_vector[i][2], s=4, c=color)
-
-        plt.title("Rzut na 3 zmienne losowe - algorytm k-środków")
-        ax.set_xlabel('x1')
-        ax.set_ylabel('x2')
-        ax.set_zlabel('x3')
-        ax.zaxis.set_rotate_label(True)
-        ax.yaxis.set_rotate_label(True)
-        plt.show()
 
     @staticmethod
     def data_set_2d(x, y):
@@ -207,3 +192,34 @@ class PlotGenerator:
         ax.set_ylabel('x2')
         ax.set_zlabel('x3')
         plt.show()
+
+    @staticmethod
+    def clusters_2d(cx_vector, x_vector):
+        rand_color = randomcolor.RandomColor()
+        for cluster in range(len(cx_vector)):
+            color = rand_color.generate()[0]
+            for i in cx_vector[cluster]:
+                plt.scatter(x_vector[i][0], x_vector[i][1], s=4, c=color)
+
+        plt.title("Rzut na 2 zmienne losowe - algorytm k-środków")
+        plt.xlabel('x1')
+        plt.ylabel('x2')
+        plt.show()
+
+    @staticmethod
+    def clusters_3d(cx_vector, x_vector):
+        fig = plt.figure()
+        ax = Axes3D(fig)
+        rand_color = randomcolor.RandomColor()
+        for cluster in range(len(cx_vector)):
+            color = rand_color.generate()[0]
+            for i in cx_vector[cluster]:
+                ax.scatter(x_vector[i][0], x_vector[i][1], x_vector[i][2], s=4, c=color)
+
+        plt.title("Rzut na 3 zmienne losowe - algorytm k-środków")
+        ax.set_xlabel('x1')
+        ax.set_ylabel('x2')
+        ax.set_zlabel('x3')
+        plt.show()
+
+
